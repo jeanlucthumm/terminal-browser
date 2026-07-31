@@ -1,0 +1,9 @@
+{
+  "version": "v0.8.1",
+  "platforms": {
+    "darwin-arm64": "3b0e034d557986ab9289aa8baefdca5c3eb66aa493e27110f4e82c05f224a738",
+    "darwin-x64": "51645cfdf0428b439434776b5c2c21e50ea1200ea618c742cb3f5d65717f79dd",
+    "linux-x64": "35e78089d1089dc4f492bbd7d2a03d57ed5543b4394b4fddf3be57c75b77747e",
+    "linux-arm64": "7f90d97003eedd6ac62e61c82290ffd280f2f0e8f266911f70ab0fbac8a102fe"
+  }
+}

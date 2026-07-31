@@ -154,6 +154,32 @@ jobs:
           scripts/publish-r2.sh | tee /tmp/publish.log
           grep -E '^(pinned|latest)=' /tmp/publish.log >> "$GITHUB_OUTPUT" || true
 
+      # nix/release.json tells the Nix package (flake.nix) which release
+      # tarballs to download and their checksums; point it at this release.
+      - name: Update Nix pin
+        if: needs.prepare.outputs.channel == 'stable'
+        run: |
+          git fetch origin main
+          git checkout -B main origin/main
+          node -e '
+            const fs = require("fs");
+            const targets = ["darwin-arm64", "darwin-x64", "linux-x64", "linux-arm64"];
+            const platforms = {};
+            let version;
+            for (const target of targets) {
+              const manifest = JSON.parse(fs.readFileSync(`dist-release/manifest-${target}.json`, "utf8"));
+              platforms[target] = manifest.sha256;
+              version = manifest.version;
+            }
+            fs.writeFileSync("nix/release.json", JSON.stringify({ version, platforms }, null, 2) + "\n");
+          '
+          if ! git diff --quiet -- nix/release.json; then
+            VERSION="$(node -p "require('./nix/release.json').version")"
+            git -c user.name="terminal-browser release" -c user.email="release@zenbu.dev" \
+              commit -m "Pin Nix flake to $VERSION [skip ci]" nix/release.json
+            git push origin main
+          fi
+
       - name: GitHub release
         if: needs.prepare.outputs.channel == 'stable'
         env:
